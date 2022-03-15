@@ -20,19 +20,26 @@ object JeuDeLaVie {
     }
   }
 
+  def calculerMinMax(g: Grille): ((Int, Int), (Int, Int)) = {
+    (g.reduce((curr, acc) => (Math.min(curr._1, acc._1), Math.min(curr._2, acc._2))), g.reduce((curr, acc) => (Math.max(curr._1, acc._1), Math.max(curr._2, acc._2))))
+  }
+
   @tailrec
-  def parcourirRectangle(grille: Grille,min: (Int, Int), max: (Int, Int), tmp: (Int, Int) = null): Unit = {
-    val pos = if (tmp == null) min else tmp;
-    if(grille.contains(pos)){
+  def afficherGrille(grille: Grille, t_min: (Int, Int) = null, t_max: (Int, Int) = null, t_pos: (Int, Int) = null): Unit = {
+    val coords = calculerMinMax(grille);
+    val min = if (t_min == null) coords._1 else t_min;
+    val max = if (t_max == null) coords._2 else t_max;
+    val pos = if (t_pos == null) min else t_pos;
+    if (grille.contains(pos)) {
       print("X")
-    }else{
+    } else {
       print("_")
     }
-    if (pos._2 < max._2) {
-      parcourirRectangle(grille, min, max, (pos._1, pos._2 + 1))
-    } else if (pos._1 < max._1) {
+    if (pos._1 < max._1) {
+      afficherGrille(grille, min, max, (pos._1+1, pos._2))
+    } else if (pos._2 < max._2) {
       print('\n')
-      parcourirRectangle(grille, min, max, (pos._1 + 1, min._2))
+      afficherGrille(grille, min, max, (min._1, pos._2+1))
     }
   }
 
@@ -97,14 +104,20 @@ object JeuDeLaVie {
 
   /*---------MAIN-----------*/
   def main(args: Array[String]): Unit = {
+    //TESTS UNITAIRES
     assert(chainesToGrille(listes.head._1).toSet.subsetOf(listes.head._2.toSet))
     assert(chainesToGrille(listes(1)._1) == listes(1)._2)
     assert(chainesToGrille(listes(2)._1) == listes(2)._2)
     assert(chainesToGrille(listes(3)._1) == listes(3)._2)
-    val grille : Grille = chainesToGrille(listes.head._1)
-    val min = (0, 0);
-    val max = (6,6);
-    parcourirRectangle(grille, min, max);
+    val g: Grille = List(
+      (-1, 2),
+      (1, -2),
+      (2, 0),
+      (2, 2),
+      (3, 2),
+    )
+    assert(calculerMinMax(g)==((-1,-2),(3,2)))
+    afficherGrille(g)
   }
   /*---------ENDOFMAIN-----------*/
 
