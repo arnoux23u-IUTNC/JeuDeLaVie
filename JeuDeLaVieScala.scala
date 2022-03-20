@@ -36,10 +36,20 @@ object JeuDeLaVie {
       print("_")
     }
     if (pos._1 < max._1) {
-      afficherGrille(grille, min, max, (pos._1+1, pos._2))
+      afficherGrille(grille, min, max, (pos._1 + 1, pos._2))
     } else if (pos._2 < max._2) {
       print('\n')
-      afficherGrille(grille, min, max, (min._1, pos._2+1))
+      afficherGrille(grille, min, max, (min._1, pos._2 + 1))
+    }
+  }
+
+  def voisines8(l: Int, c: Int): List[(Int, Int)] = (l - 1, c - 1) :: (l - 1, c) :: (l - 1, c + 1) :: (l, c - 1) :: (l, c + 1) :: (l + 1, c - 1) :: (l + 1, c) :: (l + 1, c + 1) :: Nil
+
+  def survivantes(g: Grille, origine: Grille = null): Grille = {
+    val grille = if (origine == null) g else origine
+    g match {
+      case Nil => Nil
+      case (x, y) :: reste => if (List(2, 3).contains(voisines8(x, y).count(tuple => grille.contains(tuple)))) (x, y) :: survivantes(reste, g) else survivantes(reste, g)
     }
   }
 
@@ -105,19 +115,20 @@ object JeuDeLaVie {
   /*---------MAIN-----------*/
   def main(args: Array[String]): Unit = {
     //TESTS UNITAIRES
-    assert(chainesToGrille(listes.head._1).toSet.subsetOf(listes.head._2.toSet))
-    assert(chainesToGrille(listes(1)._1) == listes(1)._2)
-    assert(chainesToGrille(listes(2)._1) == listes(2)._2)
-    assert(chainesToGrille(listes(3)._1) == listes(3)._2)
     val g: Grille = List(
       (-1, 2),
       (1, -2),
       (2, 0),
+      (1, 1),
       (2, 2),
       (3, 2),
     )
-    assert(calculerMinMax(g)==((-1,-2),(3,2)))
-    afficherGrille(g)
+    assert(calculerMinMax(g) == ((-1, -2), (3, 2)))
+    assert(voisines8(2, -1) == List((1, -2), (1, -1), (1, 0), (2, -2), (2, 0), (3, -2), (3, -1), (3, 0)))
+    assert(chainesToGrille(listes.head._1).toSet.subsetOf(listes.head._2.toSet))
+    assert(chainesToGrille(listes(1)._1) == listes(1)._2)
+    assert(chainesToGrille(listes(2)._1) == listes(2)._2)
+    assert(chainesToGrille(listes(3)._1) == listes(3)._2)
   }
   /*---------ENDOFMAIN-----------*/
 
